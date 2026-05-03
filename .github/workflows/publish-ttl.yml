@@ -1,0 +1,34 @@
+name: Publish Viyan Voice TTL Image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull GHCR and push public TTL image
+        run: |
+          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          SRC="ghcr.io/${OWNER_LC}/viyan_voice_nofallback:latest"
+          DST="ttl.sh/${OWNER_LC}-viyan-voice-nofallback:24h"
+
+          echo "SRC=$SRC"
+          echo "DST=$DST"
+
+          docker pull "$SRC"
+          docker tag "$SRC" "$DST"
+          docker push "$DST"
+
+          echo "PUBLIC_TTL_IMAGE=$DST"
