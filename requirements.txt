@@ -14,4 +14,4 @@ requests
 funasr
 modelscope
 omnivoice
-git+https://github.com/facebookresearch/omnilingual-asr.git
+omnilingual-asr
