@@ -41,7 +41,8 @@ RUN python3 -m venv --system-site-packages /opt/earenv && \
       pyarrow==24.0.0 \
       pandas==2.3.3 \
       polars==1.40.1 \
-      kenlm==0.3.0 && \
+      kenlm==0.3.0 \
+      retrying && \
     /opt/earenv/bin/python -m pip install --no-cache-dir --no-deps omnilingual-asr==0.1.0
 
 COPY handler.py /workspace/handler.py
