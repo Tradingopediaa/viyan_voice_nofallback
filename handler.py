@@ -1,6 +1,8 @@
 import os
 import base64
 import uuid
+import json
+import subprocess
 from pathlib import Path
 
 import runpod
@@ -21,6 +23,9 @@ VIYAN_VOICE_INSTRUCT = os.getenv(
 OMNI_ASR_CARD = os.getenv("VIYAN_OMNI_ASR_CARD", "omniASR_CTC_1B_v2")
 SENSE_MODEL = os.getenv("VIYAN_SENSE_MODEL", "FunAudioLLM/SenseVoiceSmall")
 OMNIVOICE_MODEL = os.getenv("VIYAN_OMNIVOICE_MODEL", "k2-fsa/OmniVoice")
+
+EAR_PYTHON = os.getenv("VIYAN_EAR_PYTHON", "/opt/earenv/bin/python")
+EAR_WORKER = os.getenv("VIYAN_EAR_WORKER", "/workspace/ear_asr_worker.py")
 
 _asr = None
 _sense = None
@@ -43,11 +48,26 @@ def gpu_status():
 
 
 def load_asr():
-    global _asr
-    if _asr is None:
-        from omnilingual_asr.models.inference.pipeline import ASRInferencePipeline
-        _asr = ASRInferencePipeline(model_card=OMNI_ASR_CARD)
-    return _asr
+    # OmniASR lives in isolated /opt/earenv because fairseq2 requires huggingface_hub 0.32.
+    # Main env uses huggingface_hub 1.5+ for OmniVoice/Transformers.
+    cmd = [EAR_PYTHON, EAR_WORKER, "--import-only"]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    if r.returncode != 0:
+        raise RuntimeError(f"OmniASR ear env import failed: {r.stderr or r.stdout}")
+    return True
+
+
+def run_asr(audio_path: str, lang=None):
+    cmd = [EAR_PYTHON, EAR_WORKER, "--audio", audio_path, "--model-card", OMNI_ASR_CARD]
+    if lang:
+        cmd += ["--lang", lang]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+    if r.returncode != 0:
+        raise RuntimeError(f"OmniASR failed: {r.stderr or r.stdout}")
+    try:
+        return json.loads(r.stdout.strip().splitlines()[-1])
+    except Exception as e:
+        raise RuntimeError(f"OmniASR JSON parse failed: {e}; stdout={r.stdout}; stderr={r.stderr}")
 
 
 def load_sense():
@@ -152,14 +172,8 @@ def handle_ear(inp: dict):
     lang = inp.get("lang")
     audio_path = save_b64_audio(audio_b64)
 
-    asr = load_asr()
-    try:
-        if lang:
-            words = asr.transcribe([audio_path], lang=[lang], batch_size=1)
-        else:
-            words = asr.transcribe([audio_path], batch_size=1)
-    except TypeError:
-        words = asr.transcribe([audio_path], batch_size=1)
+    words_packet = run_asr(audio_path, lang=lang)
+    words = words_packet.get("text")
 
     sense = load_sense()
     sense_result = sense.generate(

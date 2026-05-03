@@ -23,23 +23,39 @@ WORKDIR /workspace
 COPY requirements.txt /workspace/requirements.txt
 COPY constraints.txt /workspace/constraints.txt
 
-# Install pinned base dependencies first.
-RUN python3 -m pip install --no-cache-dir --prefer-binary -c /workspace/constraints.txt -r /workspace/requirements.txt
+# Main env: RunPod + SenseVoice + OmniVoice dependency stack.
+RUN python3 -m pip install --no-cache-dir --prefer-binary \
+    -c /workspace/constraints.txt \
+    -r /workspace/requirements.txt
 
-# Install the two specialist packages without dependency resolution.
-# Their needed dependencies are already pinned above.
-RUN python3 -m pip install --no-cache-dir --no-deps omnivoice==0.1.4 omnilingual-asr==0.1.0
+# OmniVoice installed without dependency resolution because deps are pinned above.
+RUN python3 -m pip install --no-cache-dir --no-deps omnivoice==0.1.4
+
+# Separate ASR env because OmniASR/fairseq2 requires older huggingface_hub.
+RUN python3 -m venv --system-site-packages /opt/earenv && \
+    /opt/earenv/bin/python -m pip install -U pip setuptools wheel packaging && \
+    /opt/earenv/bin/python -m pip install --no-cache-dir --prefer-binary \
+      "huggingface_hub>=0.32,<0.33" \
+      fairseq2==0.6 \
+      fairseq2n==0.6 \
+      pyarrow==24.0.0 \
+      pandas==2.3.3 \
+      polars==1.40.1 \
+      kenlm==0.3.0 && \
+    /opt/earenv/bin/python -m pip install --no-cache-dir --no-deps omnilingual-asr==0.1.0
+
+COPY handler.py /workspace/handler.py
+COPY ear_asr_worker.py /workspace/ear_asr_worker.py
 
 # Build-time import smoke test. No model download here.
 RUN python3 - <<'PYSMOKE'
 import runpod
 import torch
 from funasr import AutoModel
-from omnilingual_asr.models.inference.pipeline import ASRInferencePipeline
 from omnivoice import OmniVoice
-print("BUILD_IMPORT_SMOKE_OK")
+print("MAIN_ENV_IMPORT_OK")
 PYSMOKE
 
-COPY handler.py /workspace/handler.py
+RUN /opt/earenv/bin/python /workspace/ear_asr_worker.py --import-only
 
 CMD ["python3", "-u", "/workspace/handler.py"]
