@@ -36,13 +36,14 @@ RUN python3 -m venv --system-site-packages /opt/earenv && \
     /opt/earenv/bin/python -m pip install -U pip setuptools wheel packaging && \
     /opt/earenv/bin/python -m pip install --no-cache-dir --prefer-binary \
       "huggingface_hub>=0.32,<0.33" \
-      fairseq2==0.6 \
+      "fairseq2[arrow]==0.6" \
       fairseq2n==0.6 \
       pyarrow==24.0.0 \
       pandas==2.3.3 \
       polars==1.40.1 \
       kenlm==0.3.0 \
-      retrying && \
+      retrying \
+      xxhash && \
     /opt/earenv/bin/python -m pip install --no-cache-dir --no-deps omnilingual-asr==0.1.0
 
 COPY handler.py /workspace/handler.py
