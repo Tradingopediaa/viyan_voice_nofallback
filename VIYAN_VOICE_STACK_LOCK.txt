@@ -1,0 +1,34 @@
+ATRUVAI VIYAN VOICE STACK LOCK
+
+ONE SERVERLESS ENDPOINT:
+- viyan-voice-gpu
+
+TOTAL MODELS: 3
+
+1. STT / Words Ear:
+- Meta OmniASR CTC 1B v2
+- ENV: VIYAN_OMNI_ASR_CARD=omniASR_CTC_1B_v2
+
+2. Emotion / Audio Event Ear:
+- SenseVoiceSmall
+- ENV: VIYAN_SENSE_MODEL=FunAudioLLM/SenseVoiceSmall
+
+3. TTS / Mouth:
+- OmniVoice
+- ENV: VIYAN_OMNIVOICE_MODEL=k2-fsa/OmniVoice
+
+VOICE MODE:
+- Artificial voice design
+- No Partho/user voice clone
+- No reference voice required
+- No viyan_ref.wav
+- No viyan_ref.txt
+
+DEFAULT VOICE:
+- male, young adult, low pitch, indian accent
+
+CORE RULE:
+- Core decides words, emotion, rhythm, pause, silence, nonverbal intent.
+- Ear gives transcript + emotion/audio evidence.
+- Mouth Motor only renders explicit Core instruction.
+- No fallback.

@@ -1,0 +1,8 @@
+out/
+*.wav
+*.mp3
+*.m4a
+*.DS_Store
+__pycache__/
+*.pyc
+.env

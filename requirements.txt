@@ -1,0 +1,17 @@
+runpod
+huggingface_hub[hf_transfer]
+accelerate
+safetensors
+sentencepiece
+protobuf
+einops
+soundfile
+librosa
+numpy
+scipy
+pydantic
+requests
+funasr
+modelscope
+omnivoice
+git+https://github.com/facebookresearch/omnilingual-asr.git
