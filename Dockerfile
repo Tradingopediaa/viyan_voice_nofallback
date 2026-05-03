@@ -9,7 +9,7 @@ ENV HF_HUB_ENABLE_HF_TRANSFER=1
 
 RUN apt-get update && apt-get install -y \
     python3 python3-pip python3-venv git git-lfs ffmpeg sox \
-    libsndfile1 libsndfile1-dev build-essential curl wget \
+    libsndfile1 libsndfile1-dev build-essential cmake curl wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install -U pip setuptools wheel packaging ninja
@@ -21,7 +21,8 @@ RUN python3 -m pip install \
 WORKDIR /workspace
 
 COPY requirements.txt /workspace/requirements.txt
-RUN python3 -m pip install -r /workspace/requirements.txt
+COPY constraints.txt /workspace/constraints.txt
+RUN python3 -m pip install --no-cache-dir --prefer-binary -c /workspace/constraints.txt -r /workspace/requirements.txt
 
 COPY handler.py /workspace/handler.py
 

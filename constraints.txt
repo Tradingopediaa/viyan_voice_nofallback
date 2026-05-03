@@ -1,0 +1,10 @@
+numpy==1.26.4
+accelerate==1.12.0
+transformers==5.7.0
+tokenizers==0.22.2
+torch==2.8.0+cu128
+torchaudio==2.8.0+cu128
+fairseq2==0.6
+fairseq2n==0.6
+omnivoice==0.1.4
+omnilingual-asr==0.1.0
