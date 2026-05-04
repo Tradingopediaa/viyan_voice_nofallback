@@ -1,0 +1,18 @@
+VIYAN VOICE FINAL LAUNCH FREEZE
+
+Final selected voice:
+- voice_instruct: male, young adult, indian accent
+- speed: 0.88
+- mouth mode: voice_design
+- clone: disabled for launch
+- breath: light only
+
+Reason:
+This setting produced the most stable same-identity Indian male voice.
+Adding extra words like calm, natural emotional voice, moderate pitch, or breath modifiers caused either errors, glitches, or voice drift.
+
+Launch rule:
+Use one locked voice instruction everywhere:
+male, young adult, indian accent
+
+Do not keep testing random prompt variants before launch.

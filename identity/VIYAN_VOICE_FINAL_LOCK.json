@@ -1,0 +1,24 @@
+{
+  "status": "FINAL_LAUNCH_VOICE_LOCKED",
+  "locked_at_utc": "2026-05-04T00:53:14Z",
+  "selected_voice_file": "identity/viyan_identity_voice.wav",
+  "voice_instruct": "male, young adult, indian accent",
+  "speed": 0.88,
+  "mouth_mode": "voice_design",
+  "clone": "disabled_for_launch",
+  "breath": "light_only",
+  "allowed_voice_instruction_only": [
+    "male",
+    "young adult",
+    "indian accent"
+  ],
+  "do_not_use": [
+    "calm indian accent",
+    "natural emotional voice",
+    "moderate pitch",
+    "extra breath modifiers",
+    "unsupported instruct words",
+    "over-emotional prompt words"
+  ],
+  "launch_rule": "Use one locked voice instruction everywhere: male, young adult, indian accent. Do not keep testing random prompt variants before launch."
+}
