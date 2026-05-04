@@ -19,10 +19,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull GHCR and push public TTL image
+        shell: bash
         run: |
-          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          OWNER_LC="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
           SRC="ghcr.io/${OWNER_LC}/viyan_voice_nofallback:latest"
-          DST="ttl.sh/${OWNER_LC}-viyan-voice-nofallback:24h"
+          DST="ttl.sh/${OWNER_LC}-viyan-voice-locked:24h"
 
           echo "SRC=$SRC"
           echo "DST=$DST"
